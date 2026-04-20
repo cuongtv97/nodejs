@@ -5,7 +5,7 @@ pipeline {
     IMAGE = "ghcr.io/cuongtv97/nodejs"
     TAG = "${BUILD_NUMBER}"
     GITHUB_USER = "cuongtv97"
-    GITHUB_TOKEN = ""
+    GITHUB_TOKEN = "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"
   }
 
   stages {

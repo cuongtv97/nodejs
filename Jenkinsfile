@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'docker:24'
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
+    }
+  }
 
   environment {
     IMAGE = "ghcr.io/cuongtv97/nodejs"
@@ -12,13 +17,11 @@ pipeline {
 
     stage('Login GHCR') {
       steps {
-        sh '''
-        echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin
-        '''
+        sh 'echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin'
       }
     }
 
-    stage('Build & Push Image') {
+    stage('Build & Push') {
       steps {
         sh '''
         docker build -t $IMAGE:$TAG .
@@ -27,7 +30,7 @@ pipeline {
       }
     }
 
-    stage('Deploy K8s') {
+    stage('Deploy') {
       steps {
         sh '''
         sed -i "s|image: .*|image: $IMAGE:$TAG|" k8s/deployment.yaml

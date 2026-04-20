@@ -2,13 +2,23 @@ pipeline {
   agent any
 
   environment {
-    IMAGE = "cuongtv97/nodejs"
+    IMAGE = "ghcr.io/cuongtv97/nodejs"
     TAG = "${BUILD_NUMBER}"
+    GITHUB_USER = "cuongtv97"
+    GITHUB_TOKEN = ""
   }
 
   stages {
 
-    stage('Build Image') {
+    stage('Login GHCR') {
+      steps {
+        sh '''
+        echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin
+        '''
+      }
+    }
+
+    stage('Build & Push Image') {
       steps {
         sh '''
         docker build -t $IMAGE:$TAG .

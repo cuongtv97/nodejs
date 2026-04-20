@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nodejs-app
+  namespace: jenkins
 spec:
   replicas: 1
   selector:
@@ -12,8 +13,12 @@ spec:
       labels:
         app: nodejs
     spec:
+      imagePullSecrets:
+        - name: regcred
+
       containers:
       - name: nodejs
-        image: cuongtv97/nodejs:latest
+        image: ghcr.io/cuongtv97/nodejs:1
+        imagePullPolicy: Always
         ports:
         - containerPort: 8085

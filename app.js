@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 
 // í ½í´¥ API test
 app.get('/', (req, res) => {
-  res.send('Hello from app-nodejs í ½íº€');
+  res.send('Anh Cuong Dep Trai í ½íº€');
 });
 
 // í ½í´¥ endpoint metrics (QUAN TRá»ŒNG NHáº¤T)

@@ -1,6 +1,7 @@
 pipeline {
   agent {
     kubernetes {
+      cloud 'nodejs-cicd'   // 👈 TÊN CLOUD bạn đã tạo
       yaml """
 apiVersion: v1
 kind: Pod
@@ -9,7 +10,8 @@ spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    command: ['cat']
+    command:
+    - cat
     tty: true
 """
     }
@@ -22,26 +24,33 @@ spec:
 
   stages {
 
-    stage('Build') {
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/cuongtv97/nodejs.git'
+      }
+    }
+
+    stage('Build & Push Image') {
       steps {
         container('kaniko') {
-          sh '''
+          sh """
           /kaniko/executor \
-            --context $WORKSPACE \
-            --dockerfile Dockerfile \
-            --destination $IMAGE:$TAG \
-            --destination $IMAGE:latest
-          '''
+            --context ${WORKSPACE} \
+            --dockerfile ${WORKSPACE}/Dockerfile \
+            --destination ${IMAGE}:${TAG} \
+            --destination ${IMAGE}:latest \
+            --skip-tls-verify
+          """
         }
       }
     }
 
     stage('Deploy') {
       steps {
-        sh '''
+        sh """
         kubectl set image deployment/nodejs-app \
-        nodejs=$IMAGE:$TAG -n jenkins
-        '''
+        nodejs=${IMAGE}:${TAG} -n jenkins
+        """
       }
     }
   }
